@@ -53,9 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.white,
                           elevation: 8.0,
                           child: textWithStyle("Add City", color: Colors.blue),
-                          onPressed: () {
-
-                          }),
+                          onPressed: addCity
+                      ),
                     ],
                   ),
                 );
@@ -103,4 +102,26 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Future<Null> addCity() async {
+    return showDialog(
+      barrierDismissible: true,
+        builder: (BuildContext buildContext){
+        return new SimpleDialog(
+          contentPadding: EdgeInsets.all(20.0),
+          title: textWithStyle("Add a city", fontSize: 22.0, color: Colors.blue),
+          children: <Widget>[
+            new TextField(
+              decoration: new InputDecoration(labelText: "City: "),
+              onSubmitted: (String str){
+                Navigator.pop(buildContext);
+              },
+            )
+          ],
+        );
+        },
+        context: context);
+  }
+
+
 }
