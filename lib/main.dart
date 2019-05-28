@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,9 +29,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  List<String> cities = ["Marrakech", "Rabat", "Casablanca"];
+  String key = "cities";
+  List<String> cities = [];
   String selectedCity;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    saveCityToSharedPref();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 String city = cities[i - 2];
                 return new ListTile(
                   title: textWithStyle(city),
+                  trailing: new IconButton(
+                      icon: new Icon(Icons.delete, color: Colors.white,),
+                      onPressed: (() => deleteCityFromSharedPref(city))
+                  ),
                   onTap: () {
                     setState(() {
                       selectedCity = city;
@@ -114,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
             new TextField(
               decoration: new InputDecoration(labelText: "City: "),
               onSubmitted: (String str){
+                AddCityToSharedPref(str);
                 Navigator.pop(buildContext);
               },
             )
@@ -123,5 +137,28 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context);
   }
 
+  void saveCityToSharedPref() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    List<String> liste = await sharedPreferences.getStringList(key);
+    if (liste != null) {
+      setState(() {
+        cities = liste;
+      });
+    }
+  }
+
+  void AddCityToSharedPref(String city) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    cities.add(city);
+    await sharedPreferences.setStringList(key, cities);
+    saveCityToSharedPref();
+  }
+
+  void deleteCityFromSharedPref(String city) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    cities.remove(city);
+    await sharedPreferences.setStringList(key, cities);
+    saveCityToSharedPref();
+  }
 
 }
